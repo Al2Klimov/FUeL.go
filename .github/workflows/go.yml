@@ -1,0 +1,134 @@
+name: Go
+on:
+  push:
+    branches:
+    - master
+  pull_request: {}
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go:
+        - 1.14.x
+        - 1.15.x
+        - 1.16.x
+        goenv:
+        - GOOS=aix GOARCH=ppc64 GOPPC64=power8
+        - GOOS=aix GOARCH=ppc64 GOPPC64=power9
+        - GOOS=android GOARCH=386 GO386=softfloat
+        - GOOS=android GOARCH=386 GO386=sse2
+        - GOOS=android GOARCH=amd64
+        - GOOS=android GOARCH=arm GOARM=5
+        - GOOS=android GOARCH=arm GOARM=6
+        - GOOS=android GOARCH=arm GOARM=7
+        - GOOS=android GOARCH=arm64
+        - GOOS=darwin GOARCH=amd64
+        - GOOS=darwin GOARCH=arm64
+        - GOOS=dragonfly GOARCH=amd64
+        - GOOS=freebsd GOARCH=386 GO386=softfloat
+        - GOOS=freebsd GOARCH=386 GO386=sse2
+        - GOOS=freebsd GOARCH=amd64
+        - GOOS=freebsd GOARCH=arm GOARM=5
+        - GOOS=freebsd GOARCH=arm GOARM=6
+        - GOOS=freebsd GOARCH=arm GOARM=7
+        - GOOS=illumos GOARCH=amd64
+        - GOOS=js GOARCH=wasm
+        - GOOS=js GOARCH=wasm GOWASM=satconv
+        - GOOS=js GOARCH=wasm GOWASM=signext
+        - GOOS=linux GOARCH=386 GO386=softfloat
+        - GOOS=linux GOARCH=386 GO386=sse2
+        - GOOS=linux GOARCH=amd64
+        - GOOS=linux GOARCH=arm GOARM=5
+        - GOOS=linux GOARCH=arm GOARM=6
+        - GOOS=linux GOARCH=arm GOARM=7
+        - GOOS=linux GOARCH=arm64
+        - GOOS=linux GOARCH=ppc64 GOPPC64=power8
+        - GOOS=linux GOARCH=ppc64 GOPPC64=power9
+        - GOOS=linux GOARCH=ppc64le GOPPC64=power8
+        - GOOS=linux GOARCH=ppc64le GOPPC64=power9
+        - GOOS=linux GOARCH=mips GOMIPS=hardfloat
+        - GOOS=linux GOARCH=mips GOMIPS=softfloat
+        - GOOS=linux GOARCH=mipsle GOMIPS=hardfloat
+        - GOOS=linux GOARCH=mipsle GOMIPS=softfloat
+        - GOOS=linux GOARCH=mips64 GOMIPS64=hardfloat
+        - GOOS=linux GOARCH=mips64 GOMIPS64=softfloat
+        - GOOS=linux GOARCH=mips64le GOMIPS64=hardfloat
+        - GOOS=linux GOARCH=mips64le GOMIPS64=softfloat
+        - GOOS=linux GOARCH=riscv64
+        - GOOS=linux GOARCH=s390x
+        - GOOS=netbsd GOARCH=386 GO386=softfloat
+        - GOOS=netbsd GOARCH=386 GO386=sse2
+        - GOOS=netbsd GOARCH=amd64
+        - GOOS=netbsd GOARCH=arm GOARM=5
+        - GOOS=netbsd GOARCH=arm GOARM=6
+        - GOOS=netbsd GOARCH=arm GOARM=7
+        - GOOS=openbsd GOARCH=386 GO386=softfloat
+        - GOOS=openbsd GOARCH=386 GO386=sse2
+        - GOOS=openbsd GOARCH=amd64
+        - GOOS=openbsd GOARCH=arm GOARM=5
+        - GOOS=openbsd GOARCH=arm GOARM=6
+        - GOOS=openbsd GOARCH=arm GOARM=7
+        - GOOS=openbsd GOARCH=arm64
+        - GOOS=plan9 GOARCH=386 GO386=softfloat
+        - GOOS=plan9 GOARCH=386 GO386=sse2
+        - GOOS=plan9 GOARCH=amd64
+        - GOOS=plan9 GOARCH=arm GOARM=5
+        - GOOS=plan9 GOARCH=arm GOARM=6
+        - GOOS=plan9 GOARCH=arm GOARM=7
+        - GOOS=solaris GOARCH=amd64
+        - GOOS=windows GOARCH=386 GO386=softfloat
+        - GOOS=windows GOARCH=386 GO386=sse2
+        - GOOS=windows GOARCH=amd64
+    steps:
+    - uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+    - uses: actions/checkout@v1
+    - run: ${{ matrix.goenv }} go build ./...
+  build116:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go:
+        - 1.16.x
+        goenv:
+        - GOOS=ios GOARCH=arm64
+    steps:
+    - uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+    - uses: actions/checkout@v1
+    - run: ${{ matrix.goenv }} go build ./...
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go:
+        - 1.14.x
+        - 1.15.x
+        - 1.16.x
+    steps:
+    - uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+    - uses: actions/checkout@v1
+    - run: go test -race -v ./...
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-go@v1
+      with:
+        go-version: 1.16.x
+    - uses: actions/checkout@v1
+    - run: |
+        FILES="$(gofmt -l .)"
+        cat <<<"$FILES"
+        test -z "$FILES"
