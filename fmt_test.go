@@ -6,6 +6,31 @@ import (
 	"testing"
 )
 
+func TestFmtStateToString(t *testing.T) {
+	assertFmtStateToString(t, &Formatable{}, "")
+	assertFmtStateToString(t, &Formatable{Flags: map[int]struct{}{'+': {}}}, "+")
+	assertFmtStateToString(t, &Formatable{Wid: 0, HasWid: true}, "0")
+	assertFmtStateToString(t, &Formatable{Prec: 0, HasPrec: true}, ".0")
+
+	assertFmtStateToString(t, &Formatable{
+		Wid:     1,
+		Prec:    2,
+		Flags:   map[int]struct{}{'0': {}},
+		HasWid:  true,
+		HasPrec: true,
+	}, "01.2")
+}
+
+func assertFmtStateToString(t *testing.T, in *Formatable, out string) {
+	t.Helper()
+
+	in.Output = disallowWrite{}
+
+	if actual := FmtStateToString(in); actual != out {
+		t.Errorf("FmtStateToString(%#v): got %#v, expected %#v", in, actual, out)
+	}
+}
+
 func TestFormatable_Write(t *testing.T) {
 	var f Formatable
 	buf := &bytes.Buffer{}
@@ -64,6 +89,15 @@ func TestFormatable_Write(t *testing.T) {
 	} else {
 		t.Errorf("Formatable#Write([]byte(%#v)): error %#v, expected io.ErrClosedPipe", dummy, err)
 	}
+}
+
+type disallowWrite struct {
+}
+
+var _ io.Writer = disallowWrite{}
+
+func (dw disallowWrite) Write([]byte) (int, error) {
+	panic("don't call me")
 }
 
 type failWrite struct {

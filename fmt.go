@@ -1,10 +1,34 @@
 package fuel
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/pkg/errors"
 	"io"
+	"strconv"
 )
+
+// FmtStateToString converts $fs to its fmt.Printf() representation (see unit tests).
+func FmtStateToString(fs fmt.State) string {
+	format := &bytes.Buffer{}
+
+	for _, flag := range []byte{'+', '-', '#', ' ', '0'} {
+		if fs.Flag(int(flag)) {
+			format.WriteByte(flag)
+		}
+	}
+
+	if width, ok := fs.Width(); ok {
+		format.WriteString(strconv.FormatInt(int64(width), 10))
+	}
+
+	if precision, ok := fs.Precision(); ok {
+		format.WriteByte('.')
+		format.WriteString(strconv.FormatInt(int64(precision), 10))
+	}
+
+	return format.String()
+}
 
 // Formatable may be used instead of fmt.Fprintf() for exactly one fmt.Formatter.
 type Formatable struct {
