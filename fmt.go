@@ -30,6 +30,22 @@ func FmtStateToString(fs fmt.State) string {
 	return format.String()
 }
 
+// FormatNonFormatter forwards $fs and $verb to $nonFormatter.Format() if $nonFormatter is a fmt.Formatter.
+// Otherwise it formats $nonFormatter via fmt.Fprintf() as specified by $fs and $verb.
+func FormatNonFormatter(fs fmt.State, verb rune, nonFormatter interface{}) {
+	if formatter, ok := nonFormatter.(fmt.Formatter); ok {
+		formatter.Format(fs, verb)
+	} else {
+		format := &bytes.Buffer{}
+
+		format.WriteByte('%')
+		format.WriteString(FmtStateToString(fs))
+		format.WriteRune(verb)
+
+		fmt.Fprintf(fs, format.String(), nonFormatter)
+	}
+}
+
 // Formatable may be used instead of fmt.Fprintf() for exactly one fmt.Formatter.
 type Formatable struct {
 	// Output is the actual writer.

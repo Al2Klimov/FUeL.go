@@ -2,6 +2,7 @@ package fuel
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"testing"
 )
@@ -28,6 +29,31 @@ func assertFmtStateToString(t *testing.T, in *Formatable, out string) {
 
 	if actual := FmtStateToString(in); actual != out {
 		t.Errorf("FmtStateToString(%#v): got %#v, expected %#v", in, actual, out)
+	}
+}
+
+func TestFormatNonFormatter(t *testing.T) {
+	assertFormatNonFormatter(t, &Formatable{
+		Flags: map[int]struct{}{'+': {}},
+	}, 'd', testFormatter{"x"}, "self=x, state=+, verb=d")
+
+	assertFormatNonFormatter(t, &Formatable{
+		Wid:    2,
+		Flags:  map[int]struct{}{'0': {}},
+		HasWid: true,
+	}, 'd', 1, "01")
+}
+
+func assertFormatNonFormatter(t *testing.T, fs *Formatable, verb rune, nonFormatter interface{}, out string) {
+	t.Helper()
+
+	buf := &bytes.Buffer{}
+	fs.Output = buf
+
+	FormatNonFormatter(fs, verb, nonFormatter)
+
+	if actual := buf.String(); actual != out {
+		t.Errorf("FormatNonFormatter(%#v, %#v, %#v): got %#v, expected %#v", fs, verb, nonFormatter, actual, out)
 	}
 }
 
@@ -98,6 +124,16 @@ var _ io.Writer = disallowWrite{}
 
 func (dw disallowWrite) Write([]byte) (int, error) {
 	panic("don't call me")
+}
+
+type testFormatter struct {
+	id string
+}
+
+var _ fmt.Formatter = testFormatter{}
+
+func (tf testFormatter) Format(fs fmt.State, verb rune) {
+	fmt.Fprintf(fs, "self=%s, state=%s, verb=%c", tf.id, FmtStateToString(fs), verb)
 }
 
 type failWrite struct {
