@@ -3,7 +3,6 @@ package fuel
 import (
 	"bytes"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"strconv"
 )
@@ -65,8 +64,7 @@ var _ fmt.State = (*Formatable)(nil)
 func (f *Formatable) Write(b []byte) (n int, err error) {
 	n, err = f.Output.Write(b)
 	if err != nil {
-		// TODO: use own implementation
-		ws := errors.WithStack(err).(ErrorWithStack)
+		ws := AttachStackToError(err, 0)
 		err = ws
 
 		if f.Error == nil {

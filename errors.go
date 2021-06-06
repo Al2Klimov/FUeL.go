@@ -27,6 +27,26 @@ type Unwrapper interface {
 	Unwrap() error
 }
 
+// AttachStackToError attaches a complete errors.StackTrace of the calling goroutine to $err if needed,
+// without AttachStackToError itself and $skip additional frames at the top.
+func AttachStackToError(err error, skip int) ErrorWithStack {
+	if err == nil {
+		return nil
+	}
+
+	if ws, ok := err.(ErrorWithStack); ok {
+		return ws
+	}
+
+	return AdvancedError{
+		Err: err,
+		Stack: GetStack(
+			1 + // AttachStackToError
+				skip,
+		),
+	}
+}
+
 // GetStack returns a complete errors.StackTrace of the calling goroutine
 // without GetStack itself and $skip additional frames at the top.
 func GetStack(skip int) errors.StackTrace {

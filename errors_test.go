@@ -17,6 +17,38 @@ func TestErrorWithStack(t *testing.T) {
 	}
 }
 
+func TestAttachStackToError(t *testing.T) {
+	if actual := AttachStackToError(nil, 0); actual != nil {
+		t.Errorf("AttachStackToError(nil, 0): got %#v, expected nil", actual)
+	}
+
+	thirdParty1 := errors.New("")
+	thirdParty2 := errors.New("")
+
+	if thirdParty1 == thirdParty2 {
+		t.Error("third-party errors with stacks are not distinct")
+	} else {
+		if actual := AttachStackToError(thirdParty1, 0); actual != thirdParty1 {
+			t.Errorf("AttachStackToError(%#v, 0): got %#v, expected %#v", thirdParty1, actual, thirdParty1)
+		}
+	}
+
+	err := io.EOF
+	actual := AttachStackToError(err, 0)
+
+	if ae, ok := actual.(AdvancedError); ok {
+		if ae.Err != err {
+			t.Errorf("AttachStackToError(%#v, 0).Err: got %#v, expected %#v", err, ae.Err, err)
+		}
+
+		if stack := GetStack(0); len(ae.Stack) != len(stack) {
+			t.Errorf("AttachStackToError(%#v, 0).Stack: got %d frames, expected %d", err, len(ae.Stack), len(stack))
+		}
+	} else {
+		t.Errorf("AttachStackToError(%#v, 0): got %#v, expected an AdvancedError", err, actual)
+	}
+}
+
 func TestGetStack(t *testing.T) {
 	if stack := GetStack(0); len(stack) < 1 {
 		t.Error("GetStack(0): stack empty")
