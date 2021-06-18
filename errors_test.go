@@ -380,6 +380,24 @@ func TestErrorGroup(t *testing.T) {
 	if ae, ok := actual.(AdvancedError); !ok || ae.Err != context.Canceled {
 		t.Errorf("ErrorGroup#Wait(): got %#v, expected AdvancedError{Err: context.Canceled}", actual)
 	}
+
+	var longStack ErrorWithStack
+	recurse(64, func() {
+		eg := NewErrorGroup(context.Background(), 0)
+
+		eg.Go(1, func(context.Context) (err ErrorWithStack) {
+			recurse(64, func() {
+				err = AttachStackToError(io.EOF, 0)
+			})
+			return
+		})
+
+		longStack = eg.Wait()
+	})
+
+	if ae, ok := longStack.(AdvancedError); !ok || len(ae.Stack) < 128 {
+		t.Errorf("ErrorGroup#Wait(): got %#v, expected AdvancedError with at least 128 frames long stack", longStack)
+	}
 }
 
 func recurse(steps uint8, finally func()) {

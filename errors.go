@@ -177,6 +177,7 @@ func stackAsRaw(stack errors.StackTrace) []uintptr {
 // ErrorGroup is a more feature-rich version of golang.org/x/sync/errgroup.Group:
 //
 // * enforces usage of ErrorWithStack, not just error
+// * assembles stack across goroutines
 // * context is forwarded to tasks
 // * optional concurrency limit
 // * stops on context cancellation
@@ -206,11 +207,24 @@ func NewErrorGroup(ctx context.Context, concurrency int64) *ErrorGroup {
 func (eg *ErrorGroup) Go(weight int64, f func(context.Context) ErrorWithStack) {
 	atomic.AddUintptr(&eg.queued, 1)
 
+	select {
+	case <-eg.ctx.Done():
+		return
+	default:
+	}
+
+	stack := GetStack(0)
 	eg.rq.Enqueue(weight, func(ctx context.Context) {
 		atomic.AddUintptr(&eg.queued, ^uintptr(0))
 
 		if err := f(ctx); err != nil {
 			eg.once.Do(func() {
+				if ae, ok := err.(AdvancedError); ok {
+					err = AdvancedError{ae.Err, append(append(errors.StackTrace(nil), ae.Stack...), stack...)}
+				} else {
+					err = AdvancedError{err, append(append(errors.StackTrace(nil), err.StackTrace()...), stack...)}
+				}
+
 				eg.err = err
 				eg.cancel()
 			})
