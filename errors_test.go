@@ -88,13 +88,12 @@ func TestAdvancedError_Format(t *testing.T) {
 	const dummy = "42"
 
 	assertAdvancedError_Format(
-		t, testFormatterError{testFormatter{dummy}, pseudoError{}}, &Formatable{Wid: 2, HasWid: true}, 'v',
+		t, io.EOF, &Formatable{}, 'v',
 		func(actual []byte) string {
-			const expected = "self=42, state=2, verb=v"
-			if string(actual) == expected {
-				return ""
+			if frames := bytes.Count(actual, []byte{':'}); frames < 64 {
+				return ", too few frames"
 			} else {
-				return fmt.Sprintf(" expected %#v", expected)
+				return ""
 			}
 		},
 	)

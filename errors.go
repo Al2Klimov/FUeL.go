@@ -92,11 +92,11 @@ func (ae AdvancedError) Error() string {
 
 var _ fmt.Formatter = AdvancedError{}
 
-// Format appends the stack on %+v.
+// Format appends the stack on %+v and %v.
 func (ae AdvancedError) Format(fs fmt.State, verb rune) {
 	FormatNonFormatter(fs, verb, ae.Err)
 
-	if verb == 'v' && fs.Flag('+') {
+	if verb == 'v' {
 		ae.Stack.Format(fs, verb)
 	}
 }
