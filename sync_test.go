@@ -38,6 +38,38 @@ func TestElasticQueue(t *testing.T) {
 	})
 }
 
+func TestLimitedQueue(t *testing.T) {
+	const items = 16
+	ctx, cancel := context.WithCancel(context.Background())
+	queue := NewLimitedQueue(ctx, 4)
+
+	assertTakesTime(t, 8*time.Second, time.Second/10, func() {
+		for i := 0; i < items; i++ {
+			queue.Enqueue(2, dumbSleeper(time.Second))
+		}
+
+		queue.Wait()
+	})
+
+	assertTakesTime(t, 4*time.Second, time.Second/10, func() {
+		for i := 0; i < items; i++ {
+			queue.Enqueue(2, smartSleeper(time.Second))
+		}
+
+		time.Sleep(4 * time.Second)
+		cancel()
+		queue.Wait()
+	})
+
+	assertTakesTime(t, 0, time.Second/10, func() {
+		for i := 0; i < items; i++ {
+			queue.Enqueue(2, dumbSleeper(time.Second))
+		}
+
+		queue.Wait()
+	})
+}
+
 func assertTakesTime(t *testing.T, dur, latency time.Duration, f func()) {
 	t.Helper()
 

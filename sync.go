@@ -2,6 +2,7 @@ package fuel
 
 import (
 	"context"
+	"golang.org/x/sync/semaphore"
 	"sync"
 )
 
@@ -43,4 +44,80 @@ func (eq *ElasticQueue) Enqueue(_ int64, f func(context.Context)) {
 
 func (eq *ElasticQueue) Wait() {
 	eq.wg.Wait()
+}
+
+// LimitedQueue runs enqueued tasks with limited concurrency in FIFO order until context cancellation.
+type LimitedQueue struct {
+	eq    ElasticQueue
+	items []queueItem
+	mtx   sync.Mutex
+	sema  *semaphore.Weighted
+}
+
+// NewLimitedQueue creates a new LimitedQueue which runs $concurrency tasks at a time.
+// $ctx is forwarded to Enqueue()d tasks.
+func NewLimitedQueue(ctx context.Context, concurrency int64) *LimitedQueue {
+	return &LimitedQueue{
+		eq:   ElasticQueue{ctx: ctx},
+		sema: semaphore.NewWeighted(concurrency),
+	}
+}
+
+var _ RunQueue = (*LimitedQueue)(nil)
+
+func (lq *LimitedQueue) Enqueue(weight int64, f func(context.Context)) {
+	select {
+	case <-lq.eq.ctx.Done():
+		return
+	default:
+	}
+
+	lq.mtx.Lock()
+
+	if len(lq.items) < 1 && lq.sema.TryAcquire(weight) {
+		lq.mtx.Unlock()
+		lq.forward(weight, f)
+	} else {
+		lq.items = append(lq.items, queueItem{weight, f})
+		lq.mtx.Unlock()
+	}
+}
+
+func (lq *LimitedQueue) Wait() {
+	lq.eq.Wait()
+}
+
+func (lq *LimitedQueue) forward(weight int64, f func(context.Context)) {
+	lq.eq.Enqueue(weight, func(ctx context.Context) {
+		defer lq.nextOnes()
+		defer lq.sema.Release(weight)
+
+		f(ctx)
+	})
+}
+
+func (lq *LimitedQueue) nextOnes() {
+	select {
+	case <-lq.eq.ctx.Done():
+		return
+	default:
+	}
+
+	lq.mtx.Lock()
+
+	for len(lq.items) > 0 {
+		if next := lq.items[0]; lq.sema.TryAcquire(next.weight) {
+			lq.forward(next.weight, next.f)
+			lq.items = lq.items[1:]
+		} else {
+			break
+		}
+	}
+
+	lq.mtx.Unlock()
+}
+
+type queueItem struct {
+	weight int64
+	f      func(context.Context)
 }
