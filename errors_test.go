@@ -2,6 +2,7 @@ package fuel
 
 import (
 	"bytes"
+	"context"
 	"encoding"
 	"encoding/json"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestErrorWithStack(t *testing.T) {
@@ -270,12 +272,133 @@ func TestAdvancedError_MarshalJSON(t *testing.T) {
 	}
 }
 
+func TestErrorGroup(t *testing.T) {
+	const items = 16
+
+	{
+		ctx, cancel := context.WithCancel(context.Background())
+		eg := NewErrorGroup(ctx, 0)
+
+		assertTakesTime(t, time.Second, time.Second/10, func() {
+			for i := 0; i < items; i++ {
+				eg.Go(1, errorGroupify(dumbSleeper(time.Second), nil))
+			}
+
+			eg.Wait()
+		})
+
+		assertTakesTime(t, time.Second/2, time.Second/10, func() {
+			for i := 0; i < items; i++ {
+				eg.Go(1, errorGroupify(smartSleeper(time.Second), nil))
+			}
+
+			time.Sleep(time.Second / 2)
+			cancel()
+			eg.Wait()
+		})
+
+		assertTakesTime(t, 0, time.Second/10, func() {
+			for i := 0; i < items; i++ {
+				eg.Go(1, errorGroupify(dumbSleeper(time.Second), nil))
+			}
+
+			eg.Wait()
+		})
+	}
+
+	{
+		ctx, cancel := context.WithCancel(context.Background())
+		eg := NewErrorGroup(ctx, 4)
+
+		assertTakesTime(t, 8*time.Second, time.Second/10, func() {
+			for i := 0; i < items; i++ {
+				eg.Go(2, errorGroupify(dumbSleeper(time.Second), nil))
+			}
+
+			eg.Wait()
+		})
+
+		assertTakesTime(t, 4*time.Second, time.Second/10, func() {
+			for i := 0; i < items; i++ {
+				eg.Go(2, errorGroupify(smartSleeper(time.Second), nil))
+			}
+
+			time.Sleep(4 * time.Second)
+			cancel()
+			eg.Wait()
+		})
+
+		assertTakesTime(t, 0, time.Second/10, func() {
+			for i := 0; i < items; i++ {
+				eg.Go(2, errorGroupify(dumbSleeper(time.Second), nil))
+			}
+
+			eg.Wait()
+		})
+	}
+
+	{
+		eg := NewErrorGroup(context.Background(), 0)
+
+		eg.Go(1, func(context.Context) ErrorWithStack {
+			time.Sleep(time.Second)
+			return nil
+		})
+
+		eg.Go(1, func(context.Context) ErrorWithStack {
+			time.Sleep(2 * time.Second)
+			return AttachStackToError(io.EOF, 0)
+		})
+
+		eg.Go(1, func(context.Context) ErrorWithStack {
+			time.Sleep(3 * time.Second)
+			return AttachStackToError(io.ErrClosedPipe, 0)
+		})
+
+		actual := eg.Wait()
+		if ae, ok := actual.(AdvancedError); !ok || ae.Err != io.EOF {
+			t.Errorf("ErrorGroup#Wait(): got %#v, expected AdvancedError{Err: io.EOF}", actual)
+		}
+	}
+
+	assertTakesTime(t, time.Second, time.Second/10, func() {
+		eg := NewErrorGroup(context.Background(), 0)
+
+		eg.Go(1, errorGroupify(dumbSleeper(time.Second), io.EOF))
+		eg.Go(1, errorGroupify(smartSleeper(2*time.Second), nil))
+		eg.Wait()
+	})
+
+	ctx, cancel := context.WithCancel(context.Background())
+	eg := NewErrorGroup(ctx, 0)
+
+	eg.Go(1, errorGroupNoop)
+	cancel()
+	eg.Go(1, errorGroupNoop)
+
+	actual := eg.Wait()
+	if ae, ok := actual.(AdvancedError); !ok || ae.Err != context.Canceled {
+		t.Errorf("ErrorGroup#Wait(): got %#v, expected AdvancedError{Err: context.Canceled}", actual)
+	}
+}
+
 func recurse(steps uint8, finally func()) {
 	if steps > 0 {
 		recurse(steps-1, finally)
 	} else {
 		finally()
 	}
+}
+
+func errorGroupify(f func(context.Context), err error) func(context.Context) ErrorWithStack {
+	return func(ctx context.Context) ErrorWithStack {
+		f(ctx)
+		return AttachStackToError(err, 0)
+	}
+}
+
+func errorGroupNoop(context.Context) ErrorWithStack {
+	return nil
 }
 
 type pseudoError struct {

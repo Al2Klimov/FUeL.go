@@ -2,11 +2,14 @@ package fuel
 
 import (
 	"bytes"
+	"context"
 	"encoding"
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"runtime"
+	"sync"
+	"sync/atomic"
 	"unsafe"
 )
 
@@ -169,4 +172,58 @@ var (
 
 func stackAsRaw(stack errors.StackTrace) []uintptr {
 	return *(*[]uintptr)(unsafe.Pointer(&stack)) // errors.StackTrace is []uintptr
+}
+
+// ErrorGroup is a more feature-rich version of golang.org/x/sync/errgroup.Group:
+//
+// * enforces usage of ErrorWithStack, not just error
+// * context is forwarded to tasks
+// * optional concurrency limit
+// * stops on context cancellation
+type ErrorGroup struct {
+	cancel func()
+	ctx    context.Context
+	err    ErrorWithStack
+	once   sync.Once
+	queued uintptr
+	rq     RunQueue
+}
+
+// NewErrorGroup creates a new ErrorGroup. $ctx is forwarded to tasks. $concurrency < 1 means infinite.
+func NewErrorGroup(ctx context.Context, concurrency int64) *ErrorGroup {
+	myctx, cancel := context.WithCancel(ctx)
+	eg := &ErrorGroup{cancel: cancel, ctx: myctx}
+
+	if concurrency < 1 {
+		eg.rq = NewElasticQueue(myctx)
+	} else {
+		eg.rq = NewLimitedQueue(myctx, concurrency)
+	}
+
+	return eg
+}
+
+func (eg *ErrorGroup) Go(weight int64, f func(context.Context) ErrorWithStack) {
+	atomic.AddUintptr(&eg.queued, 1)
+
+	eg.rq.Enqueue(weight, func(ctx context.Context) {
+		atomic.AddUintptr(&eg.queued, ^uintptr(0))
+
+		if err := f(ctx); err != nil {
+			eg.once.Do(func() {
+				eg.err = err
+				eg.cancel()
+			})
+		}
+	})
+}
+
+func (eg *ErrorGroup) Wait() ErrorWithStack {
+	eg.rq.Wait()
+
+	if eg.err == nil && atomic.LoadUintptr(&eg.queued) > 0 {
+		return AttachStackToError(eg.ctx.Err(), 0)
+	}
+
+	return eg.err
 }
