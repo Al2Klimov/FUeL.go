@@ -34,7 +34,7 @@ local machines(go) = (if go >= 112 then [
   },
   { GOOS: "plan9", GOARCHs: [ "386", "amd64", "arm" ] },
   { GOOS: "solaris", GOARCHs: [ "amd64" ] },
-  { GOOS: "windows", GOARCHs: [ "386", "amd64" ] }
+  { GOOS: "windows", GOARCHs: [ "386", "amd64" ] + (if go >= 117 then [ "arm64" ] else [ ]) }
 ];
 
 local envs = {
