@@ -2434,6 +2434,426 @@
             },
             {
                "run": "go test -race -v ./..."
+            }
+         ]
+      },
+      "_117": {
+         "name": "1.17",
+         "runs-on": "ubuntu-latest",
+         "steps": [
+            {
+               "uses": "actions/setup-go@v1",
+               "with": {
+                  "go-version": "1.17.x"
+               }
+            },
+            {
+               "uses": "actions/checkout@v1"
+            },
+            {
+               "run": "GOOS=aix GOARCH=ppc64 GOPPC64=power8 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=aix GOARCH=ppc64 GOPPC64=power8 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=aix GOARCH=ppc64 GOPPC64=power9 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=aix GOARCH=ppc64 GOPPC64=power9 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=386 GO386=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=386 GO386=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=386 GO386=sse2 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=386 GO386=sse2 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm GOARM=5 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm GOARM=5 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm GOARM=6 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm GOARM=6 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm GOARM=7 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=android GOARCH=arm64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=darwin GOARCH=arm64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=dragonfly GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=dragonfly GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=386 GO386=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=386 GO386=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=386 GO386=sse2 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=386 GO386=sse2 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=arm GOARM=5 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=arm GOARM=5 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=arm GOARM=6 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=arm GOARM=6 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=arm GOARM=7 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=freebsd GOARCH=arm GOARM=7 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=illumos GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=illumos GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=ios GOARCH=arm64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=ios GOARCH=arm64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=js GOARCH=wasm CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=js GOARCH=wasm CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=js GOARCH=wasm GOWASM=satconv CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=js GOARCH=wasm GOWASM=satconv CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=js GOARCH=wasm GOWASM=signext CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=js GOARCH=wasm GOWASM=signext CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=386 GO386=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=386 GO386=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=386 GO386=sse2 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=386 GO386=sse2 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm GOARM=5 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm GOARM=5 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm GOARM=6 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=arm64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64 GOPPC64=power8 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64 GOPPC64=power8 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64 GOPPC64=power9 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64 GOPPC64=power9 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64le GOPPC64=power8 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64le GOPPC64=power8 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64le GOPPC64=power9 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=ppc64le GOPPC64=power9 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips GOMIPS=hardfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips GOMIPS=hardfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips GOMIPS=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips GOMIPS=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mipsle GOMIPS=hardfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mipsle GOMIPS=hardfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mipsle GOMIPS=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mipsle GOMIPS=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64 GOMIPS64=hardfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64 GOMIPS64=hardfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64 GOMIPS64=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64 GOMIPS64=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64le GOMIPS64=hardfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64le GOMIPS64=hardfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64le GOMIPS64=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=mips64le GOMIPS64=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=riscv64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=riscv64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=s390x CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=linux GOARCH=s390x CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=386 GO386=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=386 GO386=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=386 GO386=sse2 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=386 GO386=sse2 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=arm GOARM=5 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=arm GOARM=5 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=arm GOARM=6 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=arm GOARM=6 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=arm GOARM=7 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=netbsd GOARCH=arm GOARM=7 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=386 GO386=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=386 GO386=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=386 GO386=sse2 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=386 GO386=sse2 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm GOARM=5 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm GOARM=5 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm GOARM=6 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm GOARM=6 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm GOARM=7 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm GOARM=7 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=openbsd GOARCH=arm64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=386 GO386=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=386 GO386=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=386 GO386=sse2 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=386 GO386=sse2 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=arm GOARM=5 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=arm GOARM=5 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=arm GOARM=6 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=arm GOARM=6 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=arm GOARM=7 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=plan9 GOARCH=arm GOARM=7 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=solaris GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=solaris GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=windows GOARCH=386 GO386=softfloat CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=windows GOARCH=386 GO386=softfloat CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=windows GOARCH=386 GO386=sse2 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=windows GOARCH=386 GO386=sse2 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build ./..."
+            },
+            {
+               "run": "GOOS=windows GOARCH=amd64 CGO_ENABLED=1 go build ./..."
+            },
+            {
+               "run": "go test -race -v ./..."
             },
             {
                "run": "FILES=\"$(gofmt -d -e .)\"\ncat <<<\"$FILES\"\ntest -z \"$FILES\""

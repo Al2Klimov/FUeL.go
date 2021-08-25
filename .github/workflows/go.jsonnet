@@ -1,4 +1,4 @@
-local newest = 116;
+local newest = 117;
 local ppc64 = function(go) [ [[ "GOPPC64", "power8" ]], [[ "GOPPC64", "power9" ]] ];
 local mips = function(go) [ [[ "GOMIPS", "hardfloat" ]], [[ "GOMIPS", "softfloat" ]] ];
 local mips64 = function(go) [ [[ "GOMIPS64", "hardfloat" ]], [[ "GOMIPS64", "softfloat" ]] ];
